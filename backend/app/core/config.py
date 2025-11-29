@@ -24,11 +24,11 @@ class Settings(BaseSettings):
             elif v.startswith("postgresql://") and not v.startswith("postgresql+asyncpg://"):
                 v = v.replace("postgresql://", "postgresql+asyncpg://", 1)
             
-            # Remove sslmode query param as asyncpg doesn't support it in the URL
-            if "sslmode=" in v:
+            # Remove unsupported query params for asyncpg
+            if "sslmode=" in v or "channel_binding=" in v:
                 base_url, query = v.split("?", 1) if "?" in v else (v, "")
                 if query:
-                    params = [p for p in query.split("&") if not p.startswith("sslmode=")]
+                    params = [p for p in query.split("&") if not p.startswith("sslmode=") and not p.startswith("channel_binding=")]
                     v = base_url + ("?" + "&".join(params) if params else "")
         return v
 
