@@ -6,7 +6,12 @@ from app.core.config import settings
 
 class AIService:
     def __init__(self):
-        self.client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        api_key = os.getenv("OPENAI_API_KEY")
+        if api_key:
+            self.client = AsyncOpenAI(api_key=api_key)
+        else:
+            self.client = None
+            print("Warning: OPENAI_API_KEY not set. AI features will be disabled.")
         # Connect to Qdrant (using the service name from docker-compose)
         self.qdrant = QdrantClient(url="http://qdrant:6333")
         self.collection_name = "course_content"
@@ -19,6 +24,8 @@ class AIService:
         3. Pass chunks as context to the LLM.
         """
         try:
+            if not self.client:
+                return "AI features are currently disabled (OpenAI API Key missing)."
             response = await self.client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
@@ -36,6 +43,8 @@ class AIService:
         Transcribes a video file using OpenAI Whisper.
         """
         try:
+            if not self.client:
+                return ""
             with open(file_path, "rb") as audio_file:
                 transcript = await self.client.audio.transcriptions.create(
                     model="whisper-1", 
