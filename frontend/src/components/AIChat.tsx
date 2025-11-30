@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect, useRef } from "react";
 import { MessageSquare, X, Send, User, Bot } from "lucide-react";
 import { clsx } from "clsx";
@@ -22,10 +24,10 @@ export function AIChat() {
             // Remove /api/v1 from the end if it exists to get the base URL, then append the WS path
             // Actually API_URL usually includes /api/v1. Let's handle it carefully.
             // If API_URL is https://backend.com/api/v1, we want wss://backend.com/api/v1/ws/chat/room1
-            
+
             const cleanApiUrl = API_URL.replace(/^http/, "ws");
             const wsUrl = `${cleanApiUrl}/ws/chat/room1`;
-            
+
             console.log("Connecting to WebSocket:", wsUrl);
             const ws = new WebSocket(wsUrl);
 
